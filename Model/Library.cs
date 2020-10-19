@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using ProtoBuf;
@@ -26,6 +27,10 @@ namespace ROMZOOM.Model
         [ProtoMember(5)]
         public DateTime ModifyDate;
 
+        [ProtoMember(6)]
+        public Dictionary<int, byte[]> RomImageBank = new Dictionary<int, byte[]>();
+
+        public Dictionary<int, Bitmap> RomImages = new Dictionary<int, Bitmap>();
     }
 
     public static class Library
@@ -46,6 +51,8 @@ namespace ROMZOOM.Model
 
         public static Dictionary<int, Emulator> Emulators => _data.Emulators;
 
+        public static Dictionary<int, Bitmap> RomsImages => _data.RomImages;
+
         private static LibraryData _data;
 
         private static DateTime _modify_time;
@@ -59,6 +66,7 @@ namespace ROMZOOM.Model
                 using (var file = File.OpenRead(path))
                 {
                     _data = Serializer.Deserialize<LibraryData>(file);
+                    LoadRomImages();
                     _modify_time = _data.ModifyDate;
                 }
             }
@@ -67,6 +75,19 @@ namespace ROMZOOM.Model
                 _data = new LibraryData();
 
                 Save();
+            }
+        }
+
+        private static void LoadRomImages()
+        {
+            foreach (var rom_image_data in _data.RomImageBank)
+            {
+                using (var ms = new MemoryStream(rom_image_data.Value))
+                {
+                    var rom_image = new Bitmap(ms);
+
+                    _data.RomImages.Add(rom_image_data.Key, rom_image);
+                }
             }
         }
 
@@ -118,6 +139,33 @@ namespace ROMZOOM.Model
             _data.Emulators.Add(emu.Uid, emu);
         }
 
+        public static void SetRomImage(Rom rom, string image_path)
+        {
+            Bitmap bitmap;
+
+            using (var stream = File.OpenRead(image_path))
+            {
+                bitmap = new Bitmap(stream);
+            }
+
+            _modify_time = DateTime.Now;
+
+            if (_data.RomImages.ContainsKey(rom.Md5))
+            {
+                _data.RomImages[rom.Md5].Dispose();
+            }
+
+            _data.RomImages[rom.Md5] = bitmap;
+            _data.RomImageBank[rom.Md5] = Utils.BitmapToByteArray(bitmap);
+        }
+
+        public static void ReleaseResources()
+        {
+            foreach (var data_rom_image in _data.RomImages)
+            {
+                data_rom_image.Value.Dispose();
+            }
+        }
 
         public static void MarkDirty()
         {

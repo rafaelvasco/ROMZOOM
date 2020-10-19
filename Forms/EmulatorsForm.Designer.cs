@@ -155,7 +155,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.32961F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.67039F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 65F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 66F));
             this.tableLayoutPanel1.Controls.Add(this.lblName, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.lblExe, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.lblLaunchArgs, 0, 2);
@@ -209,7 +209,7 @@
             this.txtEmuName.ForeColor = System.Drawing.Color.White;
             this.txtEmuName.Location = new System.Drawing.Point(137, 3);
             this.txtEmuName.Name = "txtEmuName";
-            this.txtEmuName.Size = new System.Drawing.Size(317, 23);
+            this.txtEmuName.Size = new System.Drawing.Size(316, 23);
             this.txtEmuName.TabIndex = 3;
             this.txtEmuName.TextChanged += new System.EventHandler(this.TxtEmuName_TextChanged);
             // 
@@ -220,7 +220,7 @@
             this.txtEmuPath.ForeColor = System.Drawing.Color.White;
             this.txtEmuPath.Location = new System.Drawing.Point(137, 33);
             this.txtEmuPath.Name = "txtEmuPath";
-            this.txtEmuPath.Size = new System.Drawing.Size(317, 23);
+            this.txtEmuPath.Size = new System.Drawing.Size(316, 23);
             this.txtEmuPath.TabIndex = 4;
             // 
             // btnEmuPathChoose
@@ -229,7 +229,7 @@
             this.btnEmuPathChoose.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Purple;
             this.btnEmuPathChoose.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Violet;
             this.btnEmuPathChoose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEmuPathChoose.Location = new System.Drawing.Point(460, 33);
+            this.btnEmuPathChoose.Location = new System.Drawing.Point(459, 33);
             this.btnEmuPathChoose.Name = "btnEmuPathChoose";
             this.btnEmuPathChoose.Size = new System.Drawing.Size(39, 23);
             this.btnEmuPathChoose.TabIndex = 5;

@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ROMZOOM.Components;
@@ -13,10 +13,17 @@ namespace ROMZOOM.Forms
     public partial class MainForm : Form
     {
         private PlatformContextMenu _platform_item_context_menu;
+        private RomContextMenu _rom_item_context_menu;
 
         public MainForm()
         {
             InitializeComponent();
+
+            ConfigureItemLists();
+
+            comboViewStyle.DataSource = Enum.GetValues(typeof(RomsListViewMode));
+
+            comboViewStyle.SelectedItem = RomsListViewMode.List;
         }
 
         private void MainForm_Load(object sender, System.EventArgs e)
@@ -27,7 +34,26 @@ namespace ROMZOOM.Forms
 
             InitPlatformContextMenu();
 
+            InitRomContextMenu();
+
             UpdateControls();
+
+        }
+
+        private void ConfigureItemLists()
+        {
+            romsListMain.ItemRenderer = new RomListTileRenderer(Color.FromKnownColor(KnownColor.MediumSlateBlue), Color.FromKnownColor(KnownColor.MidnightBlue), 8);
+            romsListMain.TileSize = new Size(200,200);
+
+            romsListMain.HotItemStyle = new HotItemStyle
+            {
+                BackColor = Color.FromKnownColor(KnownColor.Purple)
+            };
+
+            platformsListMain.HotItemStyle = new HotItemStyle()
+            {
+                BackColor = Color.FromKnownColor(KnownColor.Purple)
+            };
 
         }
 
@@ -36,6 +62,34 @@ namespace ROMZOOM.Forms
             _platform_item_context_menu = new PlatformContextMenu(Library.Emulators, OnPlatformContextMenuItemTriggered);
         }
 
+        private void InitRomContextMenu()
+        {
+            _rom_item_context_menu = new RomContextMenu(OnRomContextMenuItemTriggered);
+        }
+
+        private void OnRomContextMenuItemTriggered(ZoomContextMenuItem item)
+        {
+            switch (item.ActionType)
+            {
+                case ZoomContextMenuItem.Type.AssignRomImage:
+
+                    if (romImageFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        try
+                        {
+                            var selected_rom = (Rom)romsListMain.SelectedObject;
+                            Library.SetRomImage(selected_rom, romImageFileDialog.FileName);
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"Error while trying to assign image rom: {e.Message}", "Error",
+                                MessageBoxButtons.OK);
+                        }
+                    }
+
+                    break;
+            }
+        }
 
         private void OnPlatformContextMenuItemTriggered(ZoomContextMenuItem item)
         {
@@ -99,6 +153,7 @@ namespace ROMZOOM.Forms
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Library.Save();
+            Library.ReleaseResources();
         }
 
         private void ScanRomsButton_Click(object sender, System.EventArgs e)
@@ -211,5 +266,29 @@ namespace ROMZOOM.Forms
             about_form.Show();
 
         }
+
+        private void RomsListMain_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                _rom_item_context_menu.Show(romsListMain, new Point(e.X, e.Y));
+            }
+        }
+
+        private void ComboViewStyle_SelectedValueChanged(object sender, EventArgs e)
+        {
+            var selected_mode = (RomsListViewMode)comboViewStyle.SelectedItem;
+
+            switch (selected_mode)
+            {
+                case RomsListViewMode.List:
+                    romsListMain.View = View.Details;
+                    break;
+                case RomsListViewMode.Tiles:
+                    romsListMain.View = View.Tile;
+                    break;
+            }
+        }
     }
 }
+

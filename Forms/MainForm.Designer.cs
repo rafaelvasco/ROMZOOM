@@ -41,12 +41,18 @@
             this.olvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.emulatorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.libraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scanRomsImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.eraseEverythingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.lblSearch = new System.Windows.Forms.Label();
+            this.romImageFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.comboViewStyle = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.platformsPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.platformsListMain)).BeginInit();
@@ -106,6 +112,7 @@
             this.platformsListMain.UnfocusedSelectedBackColor = System.Drawing.Color.Violet;
             this.platformsListMain.UnfocusedSelectedForeColor = System.Drawing.Color.Black;
             this.platformsListMain.UseCompatibleStateImageBehavior = false;
+            this.platformsListMain.UseHotItem = true;
             this.platformsListMain.View = System.Windows.Forms.View.Details;
             this.platformsListMain.SelectionChanged += new System.EventHandler(this.PlatformsListMain_SelectionChanged);
             this.platformsListMain.DoubleClick += new System.EventHandler(this.PlatformsListMain_DoubleClick);
@@ -172,8 +179,10 @@
             this.romsListMain.UnfocusedSelectedForeColor = System.Drawing.Color.Black;
             this.romsListMain.UseCompatibleStateImageBehavior = false;
             this.romsListMain.UseFiltering = true;
+            this.romsListMain.UseHotItem = true;
             this.romsListMain.View = System.Windows.Forms.View.Details;
             this.romsListMain.DoubleClick += new System.EventHandler(this.RomsListMain_DoubleClick);
+            this.romsListMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.RomsListMain_MouseClick);
             // 
             // olvColumn1
             // 
@@ -206,6 +215,7 @@
             this.menuStrip1.Font = new System.Drawing.Font("Input", 9.749999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.emulatorsToolStripMenuItem,
+            this.libraryToolStripMenuItem,
             this.optionsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(10, 10);
@@ -220,6 +230,27 @@
             this.emulatorsToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
             this.emulatorsToolStripMenuItem.Text = "Emulators";
             this.emulatorsToolStripMenuItem.Click += new System.EventHandler(this.EmulatorsToolStripMenuItem_Click);
+            // 
+            // libraryToolStripMenuItem
+            // 
+            this.libraryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.scanRomsImagesToolStripMenuItem,
+            this.eraseEverythingToolStripMenuItem});
+            this.libraryToolStripMenuItem.Name = "libraryToolStripMenuItem";
+            this.libraryToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
+            this.libraryToolStripMenuItem.Text = "Library";
+            // 
+            // scanRomsImagesToolStripMenuItem
+            // 
+            this.scanRomsImagesToolStripMenuItem.Name = "scanRomsImagesToolStripMenuItem";
+            this.scanRomsImagesToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.scanRomsImagesToolStripMenuItem.Text = "Scan Roms Images";
+            // 
+            // eraseEverythingToolStripMenuItem
+            // 
+            this.eraseEverythingToolStripMenuItem.Name = "eraseEverythingToolStripMenuItem";
+            this.eraseEverythingToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.eraseEverythingToolStripMenuItem.Text = "Erase Everything";
             // 
             // optionsToolStripMenuItem
             // 
@@ -240,7 +271,7 @@
             // 
             this.aboutToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
@@ -251,9 +282,12 @@
             // 
             // txtSearch
             // 
-            this.txtSearch.Location = new System.Drawing.Point(282, 66);
+            this.txtSearch.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.txtSearch.Font = new System.Drawing.Font("Input", 9.749999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSearch.ForeColor = System.Drawing.Color.White;
+            this.txtSearch.Location = new System.Drawing.Point(282, 63);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(713, 20);
+            this.txtSearch.Size = new System.Drawing.Size(366, 23);
             this.txtSearch.TabIndex = 4;
             this.txtSearch.TextChanged += new System.EventHandler(this.TxtSearch_TextChanged);
             this.txtSearch.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtSearch_KeyPress);
@@ -269,12 +303,42 @@
             this.lblSearch.TabIndex = 5;
             this.lblSearch.Text = "Search:";
             // 
+            // romImageFileDialog
+            // 
+            this.romImageFileDialog.FileName = "openFileDialog1";
+            // 
+            // comboViewStyle
+            // 
+            this.comboViewStyle.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.comboViewStyle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboViewStyle.Font = new System.Drawing.Font("Input", 9.749999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboViewStyle.ForeColor = System.Drawing.Color.White;
+            this.comboViewStyle.FormattingEnabled = true;
+            this.comboViewStyle.Location = new System.Drawing.Point(874, 63);
+            this.comboViewStyle.Name = "comboViewStyle";
+            this.comboViewStyle.Size = new System.Drawing.Size(121, 24);
+            this.comboViewStyle.TabIndex = 6;
+            this.comboViewStyle.SelectedValueChanged += new System.EventHandler(this.ComboViewStyle_SelectedValueChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Input", 9.749999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(783, 66);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(85, 16);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "View Style:";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MidnightBlue;
             this.ClientSize = new System.Drawing.Size(1008, 729);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.comboViewStyle);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.romsListMain);
@@ -321,6 +385,12 @@
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Label lblSearch;
         private BrightIdeasSoftware.OLVColumn olvColumn5;
+        private System.Windows.Forms.ToolStripMenuItem libraryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scanRomsImagesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem eraseEverythingToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog romImageFileDialog;
+        private System.Windows.Forms.ComboBox comboViewStyle;
+        private System.Windows.Forms.Label label1;
     }
 }
 

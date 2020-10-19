@@ -11,8 +11,8 @@ namespace ROMZOOM.Components
     {
         public enum Type
         {
-            Rename,
-            AssignEmu
+            AssignEmu,
+            AssignRomImage
         }
 
         public Type ActionType { get; set; }

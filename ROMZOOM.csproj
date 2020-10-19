@@ -83,6 +83,12 @@
     <Compile Include="Components\PlatformContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Components\RomContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\RomListTileRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Components\ZoomContextMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -127,6 +133,7 @@
     <Compile Include="Forms\PlatformPropertiesDialog.Designer.cs">
       <DependentUpon>PlatformPropertiesDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Logic\RomsListViewMode.cs" />
     <Compile Include="Model\Emulator.cs" />
     <Compile Include="Model\Library.cs" />
     <Compile Include="Forms\MainForm.cs">
@@ -189,7 +196,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\rom_image_place_holder.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\about_image.png" />
   </ItemGroup>
