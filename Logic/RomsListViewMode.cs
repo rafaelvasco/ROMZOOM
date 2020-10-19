@@ -3,6 +3,7 @@
     public enum RomsListViewMode
     {
         List,
-        Tiles
+        Tiles128,
+        Tiles256
     }
 }

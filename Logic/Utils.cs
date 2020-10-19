@@ -33,6 +33,22 @@ namespace ROMZOOM.Logic
 
         }
 
+        public static Bitmap ByteArrayToBitmap(byte[] data, int width, int  height, PixelFormat pixel_format)
+        {
+            Bitmap bmp = new Bitmap( width, height, pixel_format);  
+
+            BitmapData bmpData = bmp.LockBits(
+                new Rectangle(0, 0, bmp.Width, bmp.Height),   
+                ImageLockMode.WriteOnly, bmp.PixelFormat);
+ 
+            Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+                
+            bmp.UnlockBits(bmpData);
+
+            return bmp;
+        }
+
+
         public static string CreateMD5(byte[] byte_array)
         {
             using (var md5 = MD5.Create())

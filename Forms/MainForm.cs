@@ -42,8 +42,16 @@ namespace ROMZOOM.Forms
 
         private void ConfigureItemLists()
         {
-            romsListMain.ItemRenderer = new RomListTileRenderer(Color.FromKnownColor(KnownColor.MediumSlateBlue), Color.FromKnownColor(KnownColor.MidnightBlue), 8);
-            romsListMain.TileSize = new Size(200,200);
+            romsListMain.ItemRenderer = new RomListTileRenderer(new RomListTileRendererColors()
+            {
+                BgColor = Color.FromKnownColor(KnownColor.MidnightBlue),
+                SelectedColor = Color.FromKnownColor(KnownColor.Violet),
+                SelectedTextColor = Color.Black,
+                TextBgColor = Color.Black,
+                TextColor = Color.White
+            });
+
+            romsListMain.TileSize = new Size(128,128);
 
             romsListMain.HotItemStyle = new HotItemStyle
             {
@@ -66,6 +74,54 @@ namespace ROMZOOM.Forms
         {
             _rom_item_context_menu = new RomContextMenu(OnRomContextMenuItemTriggered);
         }
+        
+        private void UpdateControls()
+        {
+            platformsListMain.ClearObjects();
+
+            platformsListMain.AddObject(Platform.All);
+            platformsListMain.AddObjects(Library.Platforms.Values);
+
+            platformsListMain.SelectedIndex = 1;
+
+            UpdateRomsList();
+        }
+        
+        private void UpdateRomsList()
+        {
+            if (platformsListMain.SelectedObject != null)
+            {
+                var selected_platform = (Platform) platformsListMain.SelectedObject;
+
+                if (selected_platform.PlatformId != PlatformId.ALL)
+                {
+                    var roms_list = Library.Roms[((Platform) platformsListMain.SelectedObject).PlatformId];
+                    romsListMain.SetObjects(roms_list);
+                }
+                else
+                {
+                    romsListMain.ClearObjects();
+
+                    foreach (var rom in Library.Roms)
+                    {
+                        romsListMain.AddObjects(rom.Value);
+                    }
+
+                }
+                
+            }
+        }
+
+        private void ShowPlatformDialog()
+        {
+            var selected_platform = (Platform)platformsListMain.SelectedObject;
+
+            var platform_properties_dialog = new PlatformPropertiesDialog();
+
+            platform_properties_dialog.Closed += (o, args) => platformsListMain.RefreshSelectedObjects();
+
+            platform_properties_dialog.Show(selected_platform.PlatformId);
+        }
 
         private void OnRomContextMenuItemTriggered(ZoomContextMenuItem item)
         {
@@ -79,6 +135,9 @@ namespace ROMZOOM.Forms
                         {
                             var selected_rom = (Rom)romsListMain.SelectedObject;
                             Library.SetRomImage(selected_rom, romImageFileDialog.FileName);
+
+                            romsListMain.RefreshSelectedObjects();
+
                         }
                         catch (Exception e)
                         {
@@ -104,44 +163,6 @@ namespace ROMZOOM.Forms
                     Library.MarkDirty();
 
                     break;
-            }
-        }
-
-
-        private void UpdateControls()
-        {
-            platformsListMain.ClearObjects();
-
-            platformsListMain.AddObject(Platform.All);
-            platformsListMain.AddObjects(Library.Platforms.Values);
-
-            platformsListMain.SelectedIndex = 1;
-
-            UpdateRomsList();
-        }
-
-        private void UpdateRomsList()
-        {
-            if (platformsListMain.SelectedObject != null)
-            {
-                var selected_platform = (Platform) platformsListMain.SelectedObject;
-
-                if (selected_platform.PlatformId != PlatformId.ALL)
-                {
-                    var roms_list = Library.Roms[((Platform) platformsListMain.SelectedObject).PlatformId];
-                    romsListMain.SetObjects(roms_list);
-                }
-                else
-                {
-                    romsListMain.ClearObjects();
-
-                    foreach (var rom in Library.Roms)
-                    {
-                        romsListMain.AddObjects(rom.Value);
-                    }
-
-                }
-                
             }
         }
 
@@ -180,24 +201,23 @@ namespace ROMZOOM.Forms
         {
             if (e.Button == MouseButtons.Right)
             {
-                _platform_item_context_menu.Show(platformsListMain, new Point(e.X, e.Y));
+                var selected_platform = (Platform)platformsListMain.SelectedObject;
+
+                if (selected_platform.PlatformId != PlatformId.ALL)
+                {
+                    _platform_item_context_menu.Show(platformsListMain, new Point(e.X, e.Y));
+                }
             }
         }
 
         private void PlatformsListMain_DoubleClick(object sender, System.EventArgs e)
         {
-            ShowPlatformDialog();
-        }
-
-        private void ShowPlatformDialog()
-        {
             var selected_platform = (Platform)platformsListMain.SelectedObject;
 
-            var platform_properties_dialog = new PlatformPropertiesDialog();
-
-            platform_properties_dialog.Closed += (o, args) => platformsListMain.RefreshSelectedObjects();
-
-            platform_properties_dialog.Show(selected_platform.PlatformId);
+            if (selected_platform.PlatformId != PlatformId.ALL)
+            {
+                ShowPlatformDialog();
+            }
         }
 
         private void RomsListMain_DoubleClick(object sender, System.EventArgs e)
@@ -235,6 +255,14 @@ namespace ROMZOOM.Forms
             }
         }
 
+        private void RomsListMain_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                _rom_item_context_menu.Show(romsListMain, new Point(e.X, e.Y));
+            }
+        }
+
         private void TxtSearch_TextChanged(object sender, System.EventArgs e)
         {
             if (!string.IsNullOrEmpty(txtSearch.Text))
@@ -267,14 +295,6 @@ namespace ROMZOOM.Forms
 
         }
 
-        private void RomsListMain_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                _rom_item_context_menu.Show(romsListMain, new Point(e.X, e.Y));
-            }
-        }
-
         private void ComboViewStyle_SelectedValueChanged(object sender, EventArgs e)
         {
             var selected_mode = (RomsListViewMode)comboViewStyle.SelectedItem;
@@ -284,8 +304,13 @@ namespace ROMZOOM.Forms
                 case RomsListViewMode.List:
                     romsListMain.View = View.Details;
                     break;
-                case RomsListViewMode.Tiles:
+                case RomsListViewMode.Tiles128:
                     romsListMain.View = View.Tile;
+                    romsListMain.TileSize = new Size(128,128);
+                    break;
+                case RomsListViewMode.Tiles256:
+                    romsListMain.View = View.Tile;
+                    romsListMain.TileSize = new Size(256,256);
                     break;
             }
         }

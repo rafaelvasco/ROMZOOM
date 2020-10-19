@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 using ProtoBuf;
@@ -28,9 +29,25 @@ namespace ROMZOOM.Model
         public DateTime ModifyDate;
 
         [ProtoMember(6)]
-        public Dictionary<int, byte[]> RomImageBank = new Dictionary<int, byte[]>();
+        public Dictionary<int, RomImageData> RomImageBank = new Dictionary<int, RomImageData>();
 
         public Dictionary<int, Bitmap> RomImages = new Dictionary<int, Bitmap>();
+    }
+
+    [ProtoContract]
+    public class RomImageData
+    {
+        [ProtoMember(1)]
+        public byte[] ImageData { get; set; }
+        
+        [ProtoMember(2)]
+        public int Width { get; set; }
+
+        [ProtoMember(3)]
+        public int Height { get; set; }
+
+        [ProtoMember(4)]
+        public PixelFormat PixelFormat { get; set; }
     }
 
     public static class Library
@@ -82,12 +99,10 @@ namespace ROMZOOM.Model
         {
             foreach (var rom_image_data in _data.RomImageBank)
             {
-                using (var ms = new MemoryStream(rom_image_data.Value))
-                {
-                    var rom_image = new Bitmap(ms);
+                var rom_image = Utils.ByteArrayToBitmap(rom_image_data.Value.ImageData, rom_image_data.Value.Width,
+                    rom_image_data.Value.Height, rom_image_data.Value.PixelFormat);
 
-                    _data.RomImages.Add(rom_image_data.Key, rom_image);
-                }
+                _data.RomImages.Add(rom_image_data.Key, rom_image);
             }
         }
 
@@ -156,7 +171,13 @@ namespace ROMZOOM.Model
             }
 
             _data.RomImages[rom.Md5] = bitmap;
-            _data.RomImageBank[rom.Md5] = Utils.BitmapToByteArray(bitmap);
+            _data.RomImageBank[rom.Md5] = new RomImageData()
+            {
+                ImageData = Utils.BitmapToByteArray(bitmap),
+                Width = bitmap.Width,
+                Height = bitmap.Height,
+                PixelFormat = bitmap.PixelFormat
+            };
         }
 
         public static void ReleaseResources()
