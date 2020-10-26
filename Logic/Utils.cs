@@ -2,13 +2,29 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
+using DamienG.Security.Cryptography;
 
 namespace ROMZOOM.Logic
 {
     public static class Utils
     {
+        public static Bitmap LoadBitmapFromFile(string file_path)
+        {
+            Bitmap orig = new Bitmap(file_path);
+
+            Bitmap converted = new Bitmap(orig.Width, orig.Height, PixelFormat.Format32bppPArgb);
+
+            using (Graphics g = Graphics.FromImage(converted))
+            {
+                g.DrawImage(orig, new Rectangle(0, 0, converted.Width, converted.Height));
+            }
+
+            orig.Dispose();
+
+            return converted;
+        }
+
         public static byte[] BitmapToByteArray(Bitmap bitmap)
         {
 
@@ -48,29 +64,21 @@ namespace ROMZOOM.Logic
             return bmp;
         }
 
-
-        public static string CreateMD5(byte[] byte_array)
+        public static string CalcHash(string value)
         {
-            using (var md5 = MD5.Create())
-            {
-                byte[] hash_bytes = md5.ComputeHash(byte_array);
-
-                var sb = new StringBuilder();
-
-                for (int i = 0; i < hash_bytes.Length; ++i)
-                {
-                    sb.Append(hash_bytes[i].ToString("X2"));
-                }
-
-                return sb.ToString();
-            }
+            return CalcHash(Encoding.ASCII.GetBytes(value));
         }
 
-        public static string CreateMD5(string input)
-        {
-            byte[] input_bytes = Encoding.ASCII.GetBytes(input);
 
-            return CreateMD5(input_bytes);
+        public static string CalcHash(byte[] bytes)
+        {
+            var crc32 = new Crc32();
+
+            byte[] crc = crc32.ComputeHash(bytes);
+
+            return BitConverter.ToString(crc).Replace("-", string.Empty).ToLower();
+
+           
         }
 
         public static float Clamp(float value, float min, float max)
@@ -82,5 +90,6 @@ namespace ROMZOOM.Logic
         {
             return (value > max) ? max : ((value < min) ? min : value);
         }
+
     }
 }

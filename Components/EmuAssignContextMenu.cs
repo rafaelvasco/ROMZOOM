@@ -7,7 +7,6 @@ namespace ROMZOOM.Components
 {
     public sealed class EmuAssignContextMenu : ToolStripDropDown
     {
-
         public EmuAssignContextMenu(Dictionary<int, Emulator> emulators, ZoomContextMenuHandler select_handler)
         {
 

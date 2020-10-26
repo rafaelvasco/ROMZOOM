@@ -29,6 +29,9 @@ namespace ROMZOOM.Logic
                     PlatformId.GBA, new List<string> {".gba"}
                 },
                 {
+                    PlatformId.GBC, new List<string>() { ".gbc" }
+                },
+                {
                     PlatformId.GENESIS, new List<string> { ".gen", ".bin", ".md" }
                 },
                 {
@@ -39,7 +42,67 @@ namespace ROMZOOM.Logic
                 },
                 {
                     PlatformId.PSX, new List<string> { ".cue" }
-                }
+                },
+                {
+                    PlatformId._3DS, new List<string> { ".3ds" }
+                },
+                {
+                    PlatformId.ARCADE, new List<string> { ".zip" }
+                },
+                {
+                    PlatformId.CPS1, new List<string> { ".zip" }
+                },
+                {
+                    PlatformId.CPS2, new List<string> { ".zip" }
+                },
+                {
+                    PlatformId.CPS3, new List<string> { ".zip" }
+                },
+                {
+                    PlatformId.DOS, new List<string> { ".exe" }
+                },
+                {
+                    PlatformId.GC, new List<string> { ".izo", ".gcz" }
+                },
+                {
+                    PlatformId.N64, new List<string> { ".n64", ".z64" }
+                },
+                {
+                    PlatformId.NDS, new List<string> { ".nds" }
+                },
+                {
+                    PlatformId.NEOGEO, new List<string> { ".zip" }
+                },
+                {
+                    PlatformId.PC98, new List<string> { ".hdi" }
+                },
+                {
+                    PlatformId.PCENGINE, new List<string> { ".pce" }
+                },
+                {
+                    PlatformId.PCENGINECD, new List<string> { ".cue" }
+                },
+                {
+                    PlatformId.PS2, new List<string> { ".iso" }
+                },
+                {
+                    PlatformId.PS3, new List<string> { ".zzz" }
+                },
+                {
+                    PlatformId.PSP, new List<string> { ".iso", ".cso" }
+                },
+                {
+                    PlatformId.SHARPX68000, new List<string> { ".dim" }
+                },
+                {
+                    PlatformId.SWITCH, new List<string> { ".xci" }
+                },
+                {
+                    PlatformId.WII, new List<string> { ".iso", ".gcz", ".wbfs" }
+                },
+                {
+                    PlatformId.WIIU, new List<string> { ".rpx" }
+                },
             };
 
 
@@ -55,13 +118,10 @@ namespace ROMZOOM.Logic
 
                 if (platform_id != PlatformId.UNKNOWN)
                 {
-                    if (!Library.ContainsPlatform(platform_id))
-                    {
-                        var platform = new Platform(platform_id, PlatformIdDefaultDisplayNames.Get(platform_id),
-                            child_dir.FullName);
+                    var platform = new Platform(platform_id, PlatformIdMethods.GetDisplayName(platform_id),
+                        child_dir.FullName);
 
-                        result.Platforms.Add(platform);
-                    }
+                    result.Platforms.Add(platform);
                 }
                 else
                 {
@@ -81,13 +141,7 @@ namespace ROMZOOM.Logic
                 
             switch (normalized_folder_name)
             {
-                case "snes":
-                case "supernintendo":
-                case "supernes":
-                case "supernintendoentertainmentsystem":
-                case "superfamicom":
-
-                    return PlatformId.SNES;
+              
 
                 case "nes":
                 case "nintendo":
@@ -97,6 +151,59 @@ namespace ROMZOOM.Logic
                 case "gba":
                 case "gameboyadvance":
                     return PlatformId.GBA;
+
+                case "gbc":
+                case "gameboycolor":
+                    return PlatformId.GBC;
+
+                case "snes":
+                case "supernintendo":
+                case "supernes":
+                case "supernintendoentertainmentsystem":
+                case "superfamicom":
+
+                    return PlatformId.SNES;
+
+                case "ds":
+                case "nintendods":
+                case "nds":
+
+                    return PlatformId.NDS;
+
+                case "3ds":
+                case "nintendo3ds":
+                case "n3ds":
+
+                    return PlatformId._3DS;
+
+                case "gc":
+                case "gamecube":
+                case "nintendogamecube":
+
+                    return PlatformId.GC;
+
+                case "n64":
+                case "nintendo64":
+                case "64":
+
+                    return PlatformId.N64;
+
+
+                case "switch":
+                case "nintendoswitch":
+                case "nswitch":
+
+                    return PlatformId.SWITCH;
+
+                case "wii":
+                case "nintendowii":
+
+                    return PlatformId.WII;
+
+                case "wiiu":
+                case "nintendowiiu":
+
+                    return PlatformId.WIIU;
 
                 case "genesis":
                 case "megadrive":
@@ -109,6 +216,61 @@ namespace ROMZOOM.Logic
                 case "playstation1":
                 case "playstationone":
                     return PlatformId.PSX;
+
+                case "ps2":
+                case "playstation2":
+                case "play2":
+                case "playtwo":
+                case "playstationtwo":
+                    return PlatformId.PS2;
+
+                case "psp":
+                case "playstationportable":
+                    return PlatformId.PSP;
+
+
+                case "arcade":
+
+                    return PlatformId.ARCADE;
+
+                case "neogeo":
+
+                    return PlatformId.NEOGEO;
+
+                case "cps3":
+
+                    return PlatformId.CPS3;
+
+                case "cps2":
+
+                    return PlatformId.CPS2;
+
+                case "cps1":
+
+                    return PlatformId.CPS1;
+
+               
+                case "pcengine":
+                case "pce":
+
+                    return PlatformId.PCENGINE;
+
+                case "pcenginecd":
+                case "pcecd":
+
+                    return PlatformId.PCENGINECD;
+
+
+                case "sharpx68000":
+                case "sharpx68":
+
+                    return PlatformId.SHARPX68000;
+
+
+
+                case "dos":
+
+                    return PlatformId.DOS;
 
                 default: return PlatformId.UNKNOWN;
             }
@@ -153,6 +315,5 @@ namespace ROMZOOM.Logic
             return result_roms;
 
         }
-
     }
 }

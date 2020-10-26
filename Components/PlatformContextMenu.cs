@@ -15,8 +15,13 @@ namespace ROMZOOM.Components
 
             emus_sub_menu.DropDown = emu_assign_context_menu;
 
-            this.Items.Add(emus_sub_menu);
+            var delete_menu_item = new ZoomContextMenuItem("Delete", ZoomContextMenuItem.Type.DeletePlatform);
 
+            delete_menu_item.Click += (sender, args) => item_select_handler.Invoke((ZoomContextMenuItem)sender);
+
+            Items.Add(emus_sub_menu);
+
+            Items.Add(delete_menu_item);
         }
 
     }

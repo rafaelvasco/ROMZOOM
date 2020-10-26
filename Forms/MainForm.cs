@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ROMZOOM.Components;
@@ -80,9 +81,16 @@ namespace ROMZOOM.Forms
             platformsListMain.ClearObjects();
 
             platformsListMain.AddObject(Platform.All);
-            platformsListMain.AddObjects(Library.Platforms.Values);
 
-            platformsListMain.SelectedIndex = 1;
+            if (Library.Platforms.Count > 0)
+            {
+                platformsListMain.AddObjects(Library.Platforms.Values);    
+                platformsListMain.SelectedIndex = 1;
+            }
+            else
+            {
+                platformsListMain.SelectedIndex = 0;
+            }
 
             UpdateRomsList();
         }
@@ -106,9 +114,12 @@ namespace ROMZOOM.Forms
                     {
                         romsListMain.AddObjects(rom.Value);
                     }
-
                 }
                 
+            }
+            else
+            {
+                romsListMain.ClearObjects();
             }
         }
 
@@ -125,6 +136,8 @@ namespace ROMZOOM.Forms
 
         private void OnRomContextMenuItemTriggered(ZoomContextMenuItem item)
         {
+            var selected_rom = (Rom)romsListMain.SelectedObject;
+
             switch (item.ActionType)
             {
                 case ZoomContextMenuItem.Type.AssignRomImage:
@@ -133,7 +146,7 @@ namespace ROMZOOM.Forms
                     {
                         try
                         {
-                            var selected_rom = (Rom)romsListMain.SelectedObject;
+                            
                             Library.SetRomImage(selected_rom, romImageFileDialog.FileName);
 
                             romsListMain.RefreshSelectedObjects();
@@ -144,6 +157,25 @@ namespace ROMZOOM.Forms
                             MessageBox.Show($"Error while trying to assign image rom: {e.Message}", "Error",
                                 MessageBoxButtons.OK);
                         }
+                    }
+
+                    break;
+
+                case ZoomContextMenuItem.Type.ClearImage:
+
+                    Library.ClearRomImage(selected_rom);
+
+                    romsListMain.RefreshSelectedObjects();
+
+                    break;
+
+                case ZoomContextMenuItem.Type.DeleteRom:
+
+                    if (MessageBox.Show("Are you sure ? Every trace of this rom will be erased.", "Confirm Delete", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    {
+                        Library.RemoveRom(selected_rom);
+
+                        romsListMain.RemoveObject(selected_rom);
                     }
 
                     break;
@@ -163,6 +195,19 @@ namespace ROMZOOM.Forms
                     Library.MarkDirty();
 
                     break;
+
+                case ZoomContextMenuItem.Type.DeletePlatform:
+
+                    if (MessageBox.Show("Are you sure ? Every trace of this Platform and all its roms and their images, if any, will be erased.", "Confirm Delete", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    {
+                        Library.RemovePlatform(selected_platform);
+
+                        platformsListMain.RemoveObject(selected_platform);
+
+                        UpdateRomsList();
+                    }
+
+                    break;
             }
         }
 
@@ -174,7 +219,7 @@ namespace ROMZOOM.Forms
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Library.Save();
-            Library.ReleaseResources();
+            Library.ReleaseRomImages();
         }
 
         private void ScanRomsButton_Click(object sender, System.EventArgs e)
@@ -313,6 +358,73 @@ namespace ROMZOOM.Forms
                     romsListMain.TileSize = new Size(256,256);
                     break;
             }
+        }
+
+        private void ClearLibraryMenuItem_Click(object sender, EventArgs e)
+        {
+            Library.Clear();
+            UpdateControls();
+
+        }
+
+        private void MainForm_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else if (e.Data.GetDataPresent(DataFormats.Html))
+            {
+                e.Effect = DragDropEffects.Move;
+            }
+        }
+
+        private async Task HandleFileDrop(DragEventArgs e)
+        {
+            if (romsListMain.SelectedIndex > -1 && e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] file_paths = (string[]) (e.Data.GetData(DataFormats.FileDrop));
+
+                var file = file_paths[0];
+
+                if (ImageFileValidator.IsValid(file))
+                {
+                    var selected_rom = (Rom) romsListMain.SelectedObject;
+
+                    Library.SetRomImage(selected_rom, file);
+
+                    romsListMain.RefreshSelectedObjects();
+                }
+            }
+            else if (romsListMain.SelectedIndex > -1 && e.Data.GetDataPresent(DataFormats.Html))
+            {
+                var selected_rom = (Rom) romsListMain.SelectedObject;
+
+                string data = (string) e.Data.GetData(DataFormats.Html);
+
+                string image_path = HtmlCodeImageUrlExtractor.Extract(data);
+
+                Bitmap image = await ImageDownloader.Download(image_path);
+
+                if (image != null)
+                {
+                    Library.SetRomImage(selected_rom, image);
+
+                    romsListMain.RefreshSelectedObjects();
+                }
+            }
+        }
+
+        private async void MainForm_DragDrop(object sender, DragEventArgs e)
+        {
+            await HandleFileDrop(e);
+        }
+
+        private void ClearRomImagesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Library.ClearImages();
+
+            UpdateRomsList();
         }
     }
 }

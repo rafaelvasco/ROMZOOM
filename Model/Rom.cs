@@ -17,12 +17,10 @@ namespace ROMZOOM.Model
         public string Path { get;  }
 
         [ProtoMember(4)]
-        public int Md5 { get; }
+        public string Hash { get; }
 
         [ProtoMember(5)]
         public int TimesPlayed { get; set; }
-
-
 
         public Rom() {}
 
@@ -31,8 +29,7 @@ namespace ROMZOOM.Model
             PlatformId = platform_id;
             Name = name;
             Path = path;
-
-            Md5 = Utils.CreateMD5(Path).GetHashCode();
+            Hash = Utils.CalcHash(path);
         }
 
         public override string ToString()
@@ -40,17 +37,16 @@ namespace ROMZOOM.Model
             return Name;
         }
 
-
         public bool Equals(Rom other)
         {
-            if (other is null) return false;
+            if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Md5 == other.Md5;
+            return Hash == other.Hash;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
+            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((Rom) obj);
@@ -58,7 +54,7 @@ namespace ROMZOOM.Model
 
         public override int GetHashCode()
         {
-            return Md5;
+            return (Hash != null ? Hash.GetHashCode() : 0);
         }
     }
 }

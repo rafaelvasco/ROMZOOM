@@ -82,9 +82,9 @@ namespace ROMZOOM.Components
 
                 Image rom_image;
 
-                if (Library.RomsImages.ContainsKey(rom_obj.Md5))
+                if (Library.RomsImages.ContainsKey(rom_obj.Hash))
                 {
-                    rom_image = Library.RomsImages[rom_obj.Md5];
+                    rom_image = Library.RomsImages[rom_obj.Hash];
                 }
                 else
                 {

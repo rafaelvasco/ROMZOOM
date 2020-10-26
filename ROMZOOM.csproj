@@ -80,6 +80,9 @@
     <Compile Include="Components\EmuAssignContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Components\PlatformAssignContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Components\PlatformContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -133,6 +136,10 @@
     <Compile Include="Forms\PlatformPropertiesDialog.Designer.cs">
       <DependentUpon>PlatformPropertiesDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Logic\Crc32.cs" />
+    <Compile Include="Logic\HtmlCodeImageUrlExtractor.cs" />
+    <Compile Include="Logic\ImageDownloader.cs" />
+    <Compile Include="Logic\ImageFileValidator.cs" />
     <Compile Include="Logic\RomsListViewMode.cs" />
     <Compile Include="Model\Emulator.cs" />
     <Compile Include="Model\Library.cs" />

@@ -41,7 +41,7 @@
             this.emulatorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.libraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scanRomsImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.eraseEverythingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearLibraryMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,17 +51,18 @@
             this.comboViewStyle = new System.Windows.Forms.ComboBox();
             this.lblViewStyle = new System.Windows.Forms.Label();
             this.topPanel = new System.Windows.Forms.Panel();
-            this.topPanelRight = new System.Windows.Forms.Panel();
             this.topPanelLeft = new System.Windows.Forms.Panel();
+            this.topPanelRight = new System.Windows.Forms.Panel();
             this.centerPanel = new System.Windows.Forms.Panel();
+            this.clearRomImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.platformsPanel.SuspendLayout();
             this.gbPlatforms.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.platformsListMain)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.romsListMain)).BeginInit();
             this.topMenu.SuspendLayout();
             this.topPanel.SuspendLayout();
-            this.topPanelRight.SuspendLayout();
             this.topPanelLeft.SuspendLayout();
+            this.topPanelRight.SuspendLayout();
             this.centerPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -236,7 +237,8 @@
             // 
             this.libraryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.scanRomsImagesToolStripMenuItem,
-            this.eraseEverythingToolStripMenuItem});
+            this.clearLibraryMenuItem,
+            this.clearRomImagesToolStripMenuItem});
             this.libraryToolStripMenuItem.Name = "libraryToolStripMenuItem";
             this.libraryToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
             this.libraryToolStripMenuItem.Text = "Library";
@@ -247,11 +249,12 @@
             this.scanRomsImagesToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
             this.scanRomsImagesToolStripMenuItem.Text = "Scan Roms Images";
             // 
-            // eraseEverythingToolStripMenuItem
+            // clearLibraryMenuItem
             // 
-            this.eraseEverythingToolStripMenuItem.Name = "eraseEverythingToolStripMenuItem";
-            this.eraseEverythingToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
-            this.eraseEverythingToolStripMenuItem.Text = "Erase Everything";
+            this.clearLibraryMenuItem.Name = "clearLibraryMenuItem";
+            this.clearLibraryMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.clearLibraryMenuItem.Text = "Clear Everything";
+            this.clearLibraryMenuItem.Click += new System.EventHandler(this.ClearLibraryMenuItem_Click);
             // 
             // optionsToolStripMenuItem
             // 
@@ -337,16 +340,6 @@
             this.topPanel.Size = new System.Drawing.Size(788, 54);
             this.topPanel.TabIndex = 8;
             // 
-            // topPanelRight
-            // 
-            this.topPanelRight.Controls.Add(this.lblViewStyle);
-            this.topPanelRight.Controls.Add(this.comboViewStyle);
-            this.topPanelRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.topPanelRight.Location = new System.Drawing.Point(562, 0);
-            this.topPanelRight.Name = "topPanelRight";
-            this.topPanelRight.Size = new System.Drawing.Size(226, 54);
-            this.topPanelRight.TabIndex = 6;
-            // 
             // topPanelLeft
             // 
             this.topPanelLeft.Controls.Add(this.lblSearch);
@@ -356,6 +349,16 @@
             this.topPanelLeft.Name = "topPanelLeft";
             this.topPanelLeft.Size = new System.Drawing.Size(562, 54);
             this.topPanelLeft.TabIndex = 7;
+            // 
+            // topPanelRight
+            // 
+            this.topPanelRight.Controls.Add(this.lblViewStyle);
+            this.topPanelRight.Controls.Add(this.comboViewStyle);
+            this.topPanelRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this.topPanelRight.Location = new System.Drawing.Point(562, 0);
+            this.topPanelRight.Name = "topPanelRight";
+            this.topPanelRight.Size = new System.Drawing.Size(226, 54);
+            this.topPanelRight.TabIndex = 6;
             // 
             // centerPanel
             // 
@@ -367,8 +370,16 @@
             this.centerPanel.Size = new System.Drawing.Size(788, 631);
             this.centerPanel.TabIndex = 9;
             // 
+            // clearRomImagesToolStripMenuItem
+            // 
+            this.clearRomImagesToolStripMenuItem.Name = "clearRomImagesToolStripMenuItem";
+            this.clearRomImagesToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.clearRomImagesToolStripMenuItem.Text = "Clear Rom Images";
+            this.clearRomImagesToolStripMenuItem.Click += new System.EventHandler(this.ClearRomImagesToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MidnightBlue;
@@ -385,6 +396,8 @@
             this.Text = "ROMZOOM";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
             this.platformsPanel.ResumeLayout(false);
             this.gbPlatforms.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.platformsListMain)).EndInit();
@@ -392,10 +405,10 @@
             this.topMenu.ResumeLayout(false);
             this.topMenu.PerformLayout();
             this.topPanel.ResumeLayout(false);
-            this.topPanelRight.ResumeLayout(false);
-            this.topPanelRight.PerformLayout();
             this.topPanelLeft.ResumeLayout(false);
             this.topPanelLeft.PerformLayout();
+            this.topPanelRight.ResumeLayout(false);
+            this.topPanelRight.PerformLayout();
             this.centerPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -422,7 +435,7 @@
         private BrightIdeasSoftware.OLVColumn platformCol;
         private System.Windows.Forms.ToolStripMenuItem libraryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scanRomsImagesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem eraseEverythingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearLibraryMenuItem;
         private System.Windows.Forms.OpenFileDialog romImageFileDialog;
         private System.Windows.Forms.ComboBox comboViewStyle;
         private System.Windows.Forms.Label lblViewStyle;
@@ -430,6 +443,7 @@
         private System.Windows.Forms.Panel topPanelLeft;
         private System.Windows.Forms.Panel topPanelRight;
         private System.Windows.Forms.Panel centerPanel;
+        private System.Windows.Forms.ToolStripMenuItem clearRomImagesToolStripMenuItem;
     }
 }
 

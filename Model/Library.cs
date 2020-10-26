@@ -29,9 +29,9 @@ namespace ROMZOOM.Model
         public DateTime ModifyDate;
 
         [ProtoMember(6)]
-        public Dictionary<int, RomImageData> RomImageBank = new Dictionary<int, RomImageData>();
+        public Dictionary<string, RomImageData> RomImageBank = new Dictionary<string, RomImageData>();
 
-        public Dictionary<int, Bitmap> RomImages = new Dictionary<int, Bitmap>();
+        public Dictionary<string, Bitmap> RomImages = new Dictionary<string, Bitmap>();
     }
 
     [ProtoContract]
@@ -58,7 +58,7 @@ namespace ROMZOOM.Model
             set
             {
                 _data.RootPath = value;
-                _modify_time = DateTime.Now;
+                MarkDirty();
             }
         }
 
@@ -68,7 +68,7 @@ namespace ROMZOOM.Model
 
         public static Dictionary<int, Emulator> Emulators => _data.Emulators;
 
-        public static Dictionary<int, Bitmap> RomsImages => _data.RomImages;
+        public static Dictionary<string, Bitmap> RomsImages => _data.RomImages;
 
         private static LibraryData _data;
 
@@ -137,50 +137,123 @@ namespace ROMZOOM.Model
 
         public static void AddPlatform(Platform platform)
         {
-            _modify_time = DateTime.Now;
+            
             _data.Platforms.Add(platform.PlatformId, platform);
             _data.Roms[platform.PlatformId] = new List<Rom>();
+
+            MarkDirty();
+        }
+
+        public static void RemovePlatform(Platform platform)
+        {
+            List<Rom> to_remove = new List<Rom>(_data.Roms.Count);
+
+            foreach (var rom in _data.Roms[platform.PlatformId])
+            {
+                to_remove.Add(rom);
+            }
+
+            foreach (var rom in to_remove)
+            {
+                RemoveRom(rom);
+            }
+
+            _data.Roms.Remove(platform.PlatformId);
+
+            _data.Platforms.Remove(platform.PlatformId);
+
+            MarkDirty();
         }
 
         public static void AddRom(Rom rom)
         {
-            _modify_time = DateTime.Now;
+            
             _data.Roms[rom.PlatformId].Add(rom); 
+
+            MarkDirty();
+        }
+
+        public static void RemoveRom(Rom rom)
+        {
+            
+            _data.Roms[rom.PlatformId].Remove(rom);
+
+            if (_data.RomImages.ContainsKey(rom.Hash))
+            {
+                _data.RomImages[rom.Hash].Dispose();
+                _data.RomImages.Remove(rom.Hash);
+                _data.RomImageBank.Remove(rom.Hash);
+            }
+
+            MarkDirty();
+
         }
 
         public static void AddEmulator(Emulator emu)
         {
-            _modify_time = DateTime.Now;
+            MarkDirty();
             _data.Emulators.Add(emu.Uid, emu);
         }
 
-        public static void SetRomImage(Rom rom, string image_path)
+        public static void SetRomImage(Rom rom, Bitmap bitmap)
         {
-            Bitmap bitmap;
-
-            using (var stream = File.OpenRead(image_path))
+            if (_data.RomImages.ContainsKey(rom.Hash))
             {
-                bitmap = new Bitmap(stream);
+                _data.RomImages[rom.Hash].Dispose();
             }
 
-            _modify_time = DateTime.Now;
-
-            if (_data.RomImages.ContainsKey(rom.Md5))
-            {
-                _data.RomImages[rom.Md5].Dispose();
-            }
-
-            _data.RomImages[rom.Md5] = bitmap;
-            _data.RomImageBank[rom.Md5] = new RomImageData()
+            _data.RomImages[rom.Hash] = bitmap;
+            _data.RomImageBank[rom.Hash] = new RomImageData()
             {
                 ImageData = Utils.BitmapToByteArray(bitmap),
                 Width = bitmap.Width,
                 Height = bitmap.Height,
                 PixelFormat = bitmap.PixelFormat
             };
+
+            MarkDirty();
         }
 
-        public static void ReleaseResources()
+        public static void SetRomImage(Rom rom, string image_path)
+        {
+            Bitmap bitmap = Utils.LoadBitmapFromFile(image_path);
+
+            SetRomImage(rom, bitmap);
+        }
+
+        public static void Clear()
+        {
+            _data.Platforms.Clear();
+            _data.Emulators.Clear();
+
+            _data.Roms.Clear();
+
+            ClearImages();
+
+            MarkDirty();
+        }
+
+        public static void ClearImages()
+        {
+            _data.RomImageBank.Clear();
+
+            ReleaseRomImages();
+
+            _data.RomImages.Clear();
+
+            MarkDirty();
+        }
+
+        public static void ClearRomImage(Rom rom)
+        {
+            _data.RomImageBank.Remove(rom.Hash);
+            _data.RomImages[rom.Hash].Dispose();
+            _data.RomImages.Remove(rom.Hash);
+
+            MarkDirty();
+        }
+
+        public static void ReleaseRomImages()
         {
             foreach (var data_rom_image in _data.RomImages)
             {
@@ -192,6 +265,5 @@ namespace ROMZOOM.Model
         {
             _modify_time = DateTime.Now;
         }
-
     }
 }

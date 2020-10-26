@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace ROMZOOM.Components
@@ -7,12 +9,16 @@ namespace ROMZOOM.Components
 
     
 
-    public class ZoomContextMenuItem : ToolStripMenuItem
+    public sealed class ZoomContextMenuItem : ToolStripMenuItem
     {
         public enum Type
         {
             AssignEmu,
-            AssignRomImage
+            AssignRomImage,
+            SetPlatform,
+            DeletePlatform,
+            DeleteRom,
+            ClearImage
         }
 
         public Type ActionType { get; set; }
@@ -23,6 +29,9 @@ namespace ROMZOOM.Components
 
         public ZoomContextMenuItem(string label, Type type, object tag1=null, object tag2=null) : base(label)
         {
+            TextAlign = ContentAlignment.TopLeft;
+            AutoSize = false;
+            Width = 350;
             ActionType = type;
             Tag1 = tag1;
             Tag2 = tag2;
